@@ -31,10 +31,18 @@ status = np.array(data_df['Outcome'])
 train_x, valid_x, train_y, valid_y, test_x, test_y = split_dataset(features, status)
 
 # Define model
-model_path = '../pretrained/predictor_filled_notScaled_mean.h5'
+if (not FILL_DATA) & (not RESCALE_DATA):
+    model_path = '../pretrained/predictor_notFilled_notScaled.h5'
+elif (not FILL_DATA) & RESCALE_DATA:
+    model_path = '../pretrained/predictor_notFilled_scaled.h5'
+elif FILL_DATA & (not RESCALE_DATA):
+    model_path = '../pretrained/predictor_filled_notScaled.h5'
+else:
+    model_path = '../pretrained/predictor_filled_scaled.h5'
+
 checkpoint = ModelCheckpoint(filepath=model_path, monitor='val_loss', mode='min', verbose=0,
                              save_best_only=True, save_weights_only=False)
-reduceLROnPlat = ReduceLROnPlateau(monitor='val_loss', mode='min', verbose=0, factor=0.05, min_delta=0.0001, patience=10)
+reduceLROnPlat = ReduceLROnPlateau(monitor='val_loss', mode='min', verbose=0, factor=0.9, min_delta=0.0001, patience=10)
 earlyStop = EarlyStopping(monitor='val_loss', mode='min', patience=20)
 callback_list = [checkpoint, reduceLROnPlat, earlyStop]
 
@@ -79,4 +87,4 @@ binary_predictions[raw_predictions>0.5] = 1
 
 # Accuracy
 accur = np.sum(binary_predictions==test_y)/test_x.shape[0]
-print(f'Model Accuracy: {accur:0.2f}')
+print(f'Model Accuracy: {accur:0.3f}')

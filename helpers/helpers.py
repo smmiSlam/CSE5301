@@ -11,7 +11,7 @@ def z_score(data):
         features = data[:, col_idx]
         features -= features.min()
         features = features/features.max()
-        scaled_features.append(features)
+        scaled_features.append(2*features-1)
     return np.array(scaled_features).T
 
 
@@ -20,12 +20,12 @@ def fill_missing(data_df):
     zero_value_columns = ['Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI']
     for column in zero_value_columns:
         feature_values_with_outcome_0 = data_df[column][(data_df['Outcome'].values==0) & (data_df[column].values != 0)].values
-        median_value_with_outcome_0 = np.mean(feature_values_with_outcome_0)
+        median_value_with_outcome_0 = np.median(feature_values_with_outcome_0)
         zero_val_locs_with_outcome_0 = (data_df[column].values == 0) & (data_df['Outcome'].values == 0)
         data_df[column][zero_val_locs_with_outcome_0] = median_value_with_outcome_0
 
         feature_values_with_outcome_1 = data_df[column][(data_df['Outcome'].values==1) & (data_df[column].values != 0)].values
-        median_value_with_outcome_1 = np.mean(feature_values_with_outcome_1)
+        median_value_with_outcome_1 = np.median(feature_values_with_outcome_1)
         zero_val_locs_with_outcome_1 = (data_df[column].values == 0) & (data_df['Outcome'].values == 1)
         data_df[column][zero_val_locs_with_outcome_1] = median_value_with_outcome_1
 
